@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const Expense = require('../models/Expense');
+const mongoose = require('mongoose');
+const User = require('../models/User');
 
 
 
 
-
-
-router.post('/create', async (req, res) => {
+router.post('/create/:userId', async (req, res) => {
   try {
     const { name, description, category, date, amount } = req.body;
-    const createdBy = "Me"; // yes I hardcoded it
-
-    const newExpense = new Expense({ name, description, category, date, amount, createdBy });
+    const createdBy = "Me"; // hardcoded
+    const { userId } = req.params;
+    const newExpense = new Expense({ name, description, category, date, amount, createdBy, user: userId, });
     await newExpense.save();
 
     res.status(201).json({ message: 'Expense created successfully', expense: newExpense });
@@ -23,8 +23,9 @@ router.post('/create', async (req, res) => {
 
 
 
-router.get('/getall', async (req, res) => {
+router.get('/getall/:userId', async (req, res) => {
   try {
+    const userId = req.params.userId;
     const expenses = await Expense.find();
     res.json(expenses);
   } catch (error) {
